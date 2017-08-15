@@ -25,8 +25,8 @@ public class DemoPanel extends JPanel {
     }
 
     private void initializeAlgorithm() {
-        List<DataPoint> dataSet = DataSetGenerator.generateUniformRandomSet(100, 100, 100);
-        kMeans = new KMeansAlgorithm(dataSet, 3);
+        List<DataPoint> dataSet = DataSetGenerator.generateUniformRandomSet(200, 590, 590);
+        kMeans = new KMeansAlgorithm(dataSet, 10);
     }
 
     public Dimension getPreferredSize() {

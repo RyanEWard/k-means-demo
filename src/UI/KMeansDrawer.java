@@ -5,23 +5,28 @@ import Model.KMeansAlgorithm;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.Random;
 
 public class KMeansDrawer extends JPanel {
 
-    private static final int DATA_POINT_WIDTH = 4;
+    private static final int DATA_POINT_WIDTH = 6;
     private static final int DRAW_MARGIN = DATA_POINT_WIDTH;
 
     private static final Color[] STARTING_CLUSTER_COLORS
             = new Color[]{Color.blue, Color.red, Color.green, Color.orange, Color.magenta, Color.yellow};
+    private static Random rnd = new Random();
 
     private KMeansAlgorithm kMeans;
-
-    private boolean drawCentroidHistory = false;
+    private ArrayList<Color> additionalColors;
+    private boolean drawCentroidHistory = true;
 
     public KMeansDrawer(KMeansAlgorithm kMeans) {
         setVisible(true);
         setOpaque(false);
+
+        additionalColors = new ArrayList<>();
 
         this.kMeans = kMeans;
     }
@@ -48,14 +53,31 @@ public class KMeansDrawer extends JPanel {
     }
 
     private void paintClusterCentroids(Graphics g) {
-        Map<Integer, DataPoint[]> itertionToClusterCentroids = kMeans.getIterationToClusterCentroids();
+        Map<Integer, DataPoint[]> iterationToClusterCentroids = kMeans.getIterationToClusterCentroids();
 
         if (drawCentroidHistory) {
-            for (int i = 0; i < kMeans.getIteration() - 1; i++) {
-                //TODO iterate across historical centroids
+            for (int cluster = 0; cluster < iterationToClusterCentroids.get(0).length; cluster++) {
+                setClusterColor(g, cluster);
+
+                for (int iteration = 0; iteration < kMeans.getIteration() - 1; iteration++) {
+                    DataPoint priorCentroidHistory = iterationToClusterCentroids.get(iteration)[cluster];
+                    DataPoint nextCentroidHistory = iterationToClusterCentroids.get(iteration + 1)[cluster];
+                    drawPriorCentroid(g, priorCentroidHistory);
+                    drawCentroidHistoryLine(g, priorCentroidHistory, nextCentroidHistory);
+                }
+
+                int lastIteration = kMeans.getIteration();
+
+                if (lastIteration > 0) {
+                    DataPoint lastIterationCentroid = iterationToClusterCentroids.get(lastIteration - 1)[cluster];
+                    DataPoint currentCentroid = iterationToClusterCentroids.get(lastIteration)[cluster];
+
+                    drawPriorCentroid(g, lastIterationCentroid);
+                    drawCentroidHistoryLine(g, lastIterationCentroid, currentCentroid);
+                }
             }
         }
-        DataPoint[] currentCentroids = itertionToClusterCentroids.get(kMeans.getIteration());
+        DataPoint[] currentCentroids = iterationToClusterCentroids.get(kMeans.getIteration());
         for (int cluster = 0; cluster < currentCentroids.length; cluster++) {
             setClusterColor(g, cluster);
             drawCentroid(g, currentCentroids[cluster]);
@@ -69,28 +91,53 @@ public class KMeansDrawer extends JPanel {
     private void setClusterColor(Graphics g, int cluster) {
         if (cluster < STARTING_CLUSTER_COLORS.length) {
             g.setColor(STARTING_CLUSTER_COLORS[cluster]);
-        } else if (false) {
-            //TODO add colors past hard coded ones
+        } else if (cluster - STARTING_CLUSTER_COLORS.length < additionalColors.size()) {
+            //additional color already randomly assigned
+            g.setColor(additionalColors.get(cluster - STARTING_CLUSTER_COLORS.length));
         } else {
-            g.setColor(Color.black);
+            //assign additional random colors as needed
+            //using 200 max to avoid white-like colors
+            while (cluster - STARTING_CLUSTER_COLORS.length >= additionalColors.size()) {
+                additionalColors.add(new Color(rnd.nextInt(200), rnd.nextInt(200), rnd.nextInt(200)));
+            }
+            g.setColor(additionalColors.get(cluster - STARTING_CLUSTER_COLORS.length));
         }
     }
 
     private void drawDataPoint(Graphics g, DataPoint p) {
-        g.fillOval((int) p.x * 6, (int) p.y * 6, DATA_POINT_WIDTH, DATA_POINT_WIDTH);
+        g.fillOval(
+                (int) p.x + DRAW_MARGIN,
+                (int) p.y + DRAW_MARGIN,
+                DATA_POINT_WIDTH,
+                DATA_POINT_WIDTH);
     }
 
     private void drawCentroid(Graphics g, DataPoint centroid) {
         g.drawLine(
-                (int) centroid.x * 6 - DATA_POINT_WIDTH,
-                (int) centroid.y * 6 - DATA_POINT_WIDTH,
-                (int) centroid.x * 6 + DATA_POINT_WIDTH,
-                (int) centroid.y * 6 + DATA_POINT_WIDTH);
+                (int) centroid.x - DATA_POINT_WIDTH + DRAW_MARGIN,
+                (int) centroid.y - DATA_POINT_WIDTH + DRAW_MARGIN,
+                (int) centroid.x + DATA_POINT_WIDTH + DRAW_MARGIN,
+                (int) centroid.y + DATA_POINT_WIDTH + DRAW_MARGIN);
         g.drawLine(
-                (int) centroid.x * 6 - DATA_POINT_WIDTH,
-                (int) centroid.y * 6 + DATA_POINT_WIDTH,
-                (int) centroid.x * 6 + DATA_POINT_WIDTH,
-                (int) centroid.y * 6 - DATA_POINT_WIDTH);
+                (int) centroid.x - DATA_POINT_WIDTH + DRAW_MARGIN,
+                (int) centroid.y + DATA_POINT_WIDTH + DRAW_MARGIN,
+                (int) centroid.x + DATA_POINT_WIDTH + DRAW_MARGIN,
+                (int) centroid.y - DATA_POINT_WIDTH + DRAW_MARGIN);
+    }
+
+    private void drawPriorCentroid(Graphics g, DataPoint p) {
+        g.drawOval(
+                (int) p.x - DATA_POINT_WIDTH + DRAW_MARGIN,
+                (int) p.y - DATA_POINT_WIDTH + DRAW_MARGIN,
+                2 * DATA_POINT_WIDTH,
+                2 * DATA_POINT_WIDTH);
+    }
+
+    private void drawCentroidHistoryLine(Graphics g, DataPoint p1, DataPoint p2) {
+        g.drawLine((int) p1.x + DRAW_MARGIN,
+                (int) p1.y + DRAW_MARGIN,
+                (int) p2.x + DRAW_MARGIN,
+                (int) p2.y + DRAW_MARGIN);
     }
 
     public Dimension getPreferredSize() {

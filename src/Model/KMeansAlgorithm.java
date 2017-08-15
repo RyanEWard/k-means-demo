@@ -34,6 +34,26 @@ public class KMeansAlgorithm {
     }
 
     private KMeansAlgorithm(List<DataPoint> dataSet, int k, DataPoint[] initialCentroids, int maxIterations) {
+        initialize(dataSet, k, initialCentroids, maxIterations);
+    }
+
+    public void reset() {
+        reset(dataSet, currentClusterCentroids.length, iterationToClusterCentroids.get(0), maxIterations);
+    }
+
+    public void reset(List<DataPoint> dataSet) {
+        reset(dataSet, currentClusterCentroids.length, new DataPoint[0], maxIterations);
+    }
+
+    public void reset(List<DataPoint> dataSet, int k) {
+        reset(dataSet, k, new DataPoint[0], maxIterations);
+    }
+
+    public void reset(List<DataPoint> dataSet, int k, DataPoint[] initialCentroids, int maxIterations) {
+        initialize(dataSet, k, initialCentroids, maxIterations);
+    }
+
+    private void initialize(List<DataPoint> dataSet, int k, DataPoint[] initialCentroids, int maxIterations) {
         this.dataSet = dataSet;
 
         iteration = 0;
