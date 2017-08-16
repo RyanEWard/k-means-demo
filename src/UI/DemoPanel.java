@@ -17,15 +17,15 @@ public class DemoPanel extends JPanel {
 
         this.setLayout(new BorderLayout());
 
-        OptionsPanel options = new OptionsPanel(kMeans, this);
-        add(options, BorderLayout.LINE_START);
-
         KMeansDrawer drawer = new KMeansDrawer(kMeans);
         add(drawer, BorderLayout.CENTER);
+
+        OptionsPanel options = new OptionsPanel(kMeans, this);
+        add(options, BorderLayout.PAGE_END);
     }
 
     private void initializeAlgorithm() {
-        List<DataPoint> dataSet = DataSetGenerator.generateUniformRandomSet(200, 590, 590);
+        List<DataPoint> dataSet = DataSetGenerator.generateUniformRandomSet(200, 800, 540);
         kMeans = new KMeansAlgorithm(dataSet, 10);
     }
 

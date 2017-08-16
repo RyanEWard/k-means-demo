@@ -36,6 +36,8 @@ public class KMeansDrawer extends JPanel {
 
         Graphics2D g2 = (Graphics2D) g;
 
+        g2.setBackground(Color.white);
+
         RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHints(rh);
 
@@ -141,6 +143,6 @@ public class KMeansDrawer extends JPanel {
     }
 
     public Dimension getPreferredSize() {
-        return new Dimension(600, 600);
+        return new Dimension(800, 500);
     }
 }

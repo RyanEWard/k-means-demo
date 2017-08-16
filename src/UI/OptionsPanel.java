@@ -23,7 +23,7 @@ public class OptionsPanel extends JPanel {
         this.kMeans = kMeans;
         this.parent = parent;
 
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.setLayout(new FlowLayout());
 
         initializeIterationLabel();
 
@@ -72,7 +72,7 @@ public class OptionsPanel extends JPanel {
         JButton resetButton = new JButton("Reset");
         resetButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                List<DataPoint> dataSet = DataSetGenerator.generateUniformRandomSet(200, 590, 590);
+                List<DataPoint> dataSet = DataSetGenerator.generateUniformRandomSet(200, 800, 540);
                 kMeans.reset(dataSet, getCurrentSetClusterInput());
                 setIterationLabel();
                 parent.repaint();
@@ -109,6 +109,6 @@ public class OptionsPanel extends JPanel {
     }
 
     public Dimension getPreferredSize() {
-        return new Dimension(200, 600);
+        return new Dimension(800, 50);
     }
 }
